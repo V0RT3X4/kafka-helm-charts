@@ -9,7 +9,7 @@ metadata:
     heritage: "{{ .Release.Service }}"
     lenses.io/app: {{ include "fullname" . }}
     lenses.io/app.type: lenses-connector
-    lenses.io/pipeline: {{ .Values.monitoring.pipeline | quote }}    
+    lenses.io/pipeline: {{ .Values.monitoring.pipeline | quote }}
 spec:
   replicas: {{ .Values.replicaCount }}
   serviceName: {{ template "fullname" . }}-headless
@@ -20,7 +20,7 @@ spec:
         app: {{ include "fullname" . }}
         hostPort: {{ .Values.restPort | quote }}
         containerPort: {{ .Values.restPort | quote }}
-        lenses.io/app: {{ include "fullname" . }}        
+        lenses.io/app: {{ include "fullname" . }}
         lenses.io/pipeline: {{ .Values.monitoring.pipeline | quote }}
         lenses.io/app.type: lenses-connector
       annotations:
@@ -28,8 +28,8 @@ spec:
         prometheus.io/port: {{ .Values.monitoring.port | quote }}
         prometheus.io/path: {{ .Values.monitoring.path | quote }}
     spec:
-      {{- if or .Values.kafka.ssl.enabled .Values.kafka.sasl.enabled }} 
-      volumes:                
+      {{- if or .Values.kafka.ssl.enabled .Values.kafka.sasl.enabled }}
+      volumes:
         - name: kafka-secrets
           secret:
             secretName: {{ include "fullname" . }}
@@ -38,21 +38,21 @@ spec:
               {{- if .Values.kafka.ssl.enabled }}
               - key: client.keystore.jks
                 path: client.keystore.jks
-              - key: client.truststore.jks 
+              - key: client.truststore.jks
                 path: client.truststore.jks
-              {{- end }}  
+              {{- end }}
               {{- if .Values.kafka.sasl.enabled }}
               - key: jaas.conf
                 path: jaas.conf
               - key: keytab
-                path: keytab  
+                path: keytab
               {{- end }}
         {{- if eq .Values.kafka.sasl.mechanism "GSSAPI" }}
         - name: krb
           configMap:
             name: {{ include "fullname" . | quote }}
-        {{- end }}                     
-      {{- end }}            
+        {{- end }}
+      {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -67,16 +67,16 @@ spec:
           timeoutSeconds: 5
         resources:
 {{ toYaml .Values.resources | indent 10 }}
-        {{- if or .Values.kafka.ssl.enabled .Values.kafka.sasl.enabled }} 
-        volumeMounts: 
+        {{- if or .Values.kafka.ssl.enabled .Values.kafka.sasl.enabled }}
+        volumeMounts:
           - name: kafka-secrets
             mountPath: "/mnt/secrets"
           {{- if eq .Values.kafka.sasl.mechanism "GSSAPI" }}
           - name: krb
             mountPath: "/etc/krb5.conf"
             subPath: "krb5.conf"
-          {{- end }}            
-        {{- end }} 
+          {{- end }}
+        {{- end }}
         env:
         # JVM Heap Allowance
         - name: KAFKA_HEAP_OPTS
@@ -116,32 +116,32 @@ spec:
         - name:  CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR
           value: {{ .Values.kafka.replicationFactor | quote }}
         - name:  CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR
-          value: {{ .Values.kafka.replicationFactor | quote }} 
+          value: {{ .Values.kafka.replicationFactor | quote }}
         - name:  CONNECT_STATUS_STORAGE_REPLICATION_FACTOR
-          value: {{ .Values.kafka.replicationFactor | quote }}  
+          value: {{ .Values.kafka.replicationFactor | quote }}
 
         - name: CONNECT_PRODUCER_SECURITY_PROTOCOL
           value: {{ include "securityProtocol" . | quote }}
         - name: CONNECT_CONSUMER_SECURITY_PROTOCOL
-          value: {{ include "securityProtocol" . | quote }}          
+          value: {{ include "securityProtocol" . | quote }}
         - name: CONNECTOR_PRODUCER_SECURITY_PROTOCOL
-          value: {{ include "securityProtocol" . | quote }}  
+          value: {{ include "securityProtocol" . | quote }}
         - name: CONNECTOR_CONSUMER_SECURITY_PROTOCOL
-          value: {{ include "securityProtocol" . | quote }}  
+          value: {{ include "securityProtocol" . | quote }}
 
         {{- if .Values.kafka.sasl.enabled }}
         - name: KAFKA_OPTS
-          value: "-Djava.security.auth.login.config=/mnt/secrets/jaas.conf -Xmx{{ .Values.javaHeap }}"        
+          value: "-Djava.security.auth.login.config=/mnt/secrets/jaas.conf -Xmx{{ .Values.javaHeap }}"
         - name: CONNECT_PRODUCER_SASL_MECHANISM
           value: {{ default "GSSAPI" .Values.kafka.sasl.mechanism | quote }}
         - name: CONNECT_CONSUMER_SASL_MECHANISM
-          value: {{ default "GSSAPI" .Values.kafka.sasl.mechanism | quote }}     
+          value: {{ default "GSSAPI" .Values.kafka.sasl.mechanism | quote }}
         - name: CONNECTOR_PRODUCER_SASL_MECHANISM
-          value: {{ default "GSSAPI" .Values.kafka.sasl.mechanism | quote }}  
+          value: {{ default "GSSAPI" .Values.kafka.sasl.mechanism | quote }}
         - name: CONNECTOR_CONSUMER_SASL_MECHANISM
-          value: {{ default "GSSAPI" .Values.kafka.sasl.mechanism | quote }}      
-        {{- end }}  
-   
+          value: {{ default "GSSAPI" .Values.kafka.sasl.mechanism | quote }}
+        {{- end }}
+
         {{- if .Values.kafka.ssl.enabled }}
         - name: CONNECT_PRODUCER_SSL_TRUSTSTORE_LOCATION
           value: "/mnt/secrets/client.truststore.jks"
@@ -160,7 +160,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: "{{ include "fullname" . }}-kafka-secrets"
-              key:  "client.truststore.password"                                  
+              key:  "client.truststore.password"
         - name: WORKER_CONNECT_SECRET_PRODUCER_SSL_KEYSTORE_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -170,7 +170,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: "{{ include "fullname" . }}-kafka-secrets"
-              key:  "client.keystore.password"              
+              key:  "client.keystore.password"
 
         - name: CONNECTOR_PRODUCER_SSL_TRUSTSTORE_LOCATION
           value: "/mnt/secrets/client.truststore.jks"
@@ -189,7 +189,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: "{{ include "fullname" . }}-kafka-secrets"
-              key:  "client.truststore.password"                                  
+              key:  "client.truststore.password"
         - name: SECRET_PRODUCER_SSL_KEYSTORE_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -199,12 +199,12 @@ spec:
           valueFrom:
             secretKeyRef:
               name: "{{ include "fullname" . }}-kafka-secrets"
-              key:  "client.keystore.password"  
+              key:  "client.keystore.password"
         {{- end }}
-  
+
         # Connector properties
         - name: SECRETS_PROVIDER
-          value: {{ .Values.secretsProvider | quote }} 
+          value: {{ .Values.secretsProvider | quote }}
         - name: CONNECTOR_NAME
           value: {{ .Values.applicationId | quote }}
         - name: CONNECTOR_GROUP_ID
@@ -214,20 +214,22 @@ spec:
         - name: CONNECTOR_TASKS_MAX
           value: {{ .Values.replicaCount | quote }}
         - name: CONNECTOR_TOPICS
-          value: {{ .Values.topics | quote }}    
+          value: {{ .Values.topics | quote }}
         - name: CONNECTOR_CONNECT_REDIS_HOST
-          value: {{ .Values.host | quote }}          
+          value: {{ .Values.host | quote }}
         - name: CONNECTOR_CONNECT_REDIS_PORT
           value: {{ .Values.port | quote }}
+        {{- if .Values.password }}
         - name: SECRET_CONNECT_REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "fullname" . }}
               key:  "connect.redis.password"
+        {{- end }}
         - name: CONNECTOR_CONNECT_REDIS_KCQL
           value: {{ .Values.kcql | quote }}
         - name: CONNECTOR_CONNECT_REDIS_MAX_RETRIES
-          value: {{ .Values.maxRetries | quote }}          
+          value: {{ .Values.maxRetries | quote }}
         - name: CONNECTOR_CONNECT_REDIS_RETRY_INTERVAL
           value: {{ .Values.retryInterval | quote }}
         - name: CONNECTOR_CONNECT_REDIS_ERROR_POLICY
