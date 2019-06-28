@@ -225,6 +225,9 @@ spec:
             secretKeyRef:
               name: {{ include "fullname" . }}
               key:  "connect.redis.password"
+        {{- else }}
+        - name: SECRET_I_DONT_MATTER
+          value: I Dont Matter
         {{- end }}
         - name: CONNECTOR_CONNECT_REDIS_KCQL
           value: {{ .Values.kcql | quote }}
