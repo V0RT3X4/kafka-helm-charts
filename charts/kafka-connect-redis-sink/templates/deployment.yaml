@@ -220,12 +220,14 @@ spec:
         - name: CONNECTOR_CONNECT_REDIS_PORT
           value: {{ .Values.port | quote }}
         {{- if .Values.password }}
+        # only create SECRET_CONNECT_REDIS_PASSWORD if auth token supplied
         - name: SECRET_CONNECT_REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "fullname" . }}
               key:  "connect.redis.password"
         {{- else }}
+        # Hack so that lenses-cli will create /etc/kafka-connect/secrets.properties
         - name: SECRET_I_DONT_MATTER
           value: I Dont Matter
         {{- end }}
