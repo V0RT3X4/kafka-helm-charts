@@ -250,11 +250,18 @@ spec:
         {{- end }}
         - name: CONNECTOR_CONNECT_ELASTIC_URL_PREFIX
           value: {{ .Values.urlPrefix | quote }}
+        {{- if .Values.xpackSettings }}
+        # only create SECRET_CONNECT_REDIS_PASSWORD if auth token supplied
         - name: SECRET_CONNECT_ELASTIC_XPACK_SETTINGS
           valueFrom:
             secretKeyRef:
               name: {{ include "fullname" . }}
               key:  "connect.elastic.xpack.settings"
+        {{- else }}
+        # Hack so that lenses-cli will create /etc/kafka-connect/secrets.properties
+        - name: SECRET_I_DONT_MATTER
+          value: I Dont Matter
+        {{- end }}
         - name: CONNECTOR_CONNECT_ELASTIC_URL
           value: {{ .Values.url | quote }}
         
