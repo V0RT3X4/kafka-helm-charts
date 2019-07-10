@@ -244,14 +244,17 @@ spec:
           value: {{ .Values.elasticClusterName | quote }}
         - name: CONNECTOR_CONNECT_ELASTIC_WRITE_TIMEOUT
           value: {{ .Values.writeTimeout | quote }}
-        {{- if .Values.xpackPlugins }}
-        - name: CONNECTOR_CONNECT_ELASTIC_XPACK_PLUGINS
-          value: {{ .Values.xpackPlugins | quote }}
-        {{- end }}
+
         - name: CONNECTOR_CONNECT_ELASTIC_URL_PREFIX
           value: {{ .Values.urlPrefix | quote }}
+        - name: CONNECTOR_CONNECT_ELASTIC_URL
+          value: {{ .Values.url | quote }}
+
+
         {{- if .Values.xpackSettings }}
-        # only create SECRET_CONNECT_REDIS_PASSWORD if auth token supplied
+        - name: CONNECTOR_CONNECT_ELASTIC_XPACK_PLUGINS
+          value: {{ .Values.xpackPlugins | quote }}
+        # only create SECRET_CONNECT_ELASTIC_XPACK_SETTINGS if xpackSettings supplied
         - name: SECRET_CONNECT_ELASTIC_XPACK_SETTINGS
           valueFrom:
             secretKeyRef:
@@ -262,7 +265,3 @@ spec:
         - name: SECRET_I_DONT_MATTER
           value: I Dont Matter
         {{- end }}
-        - name: CONNECTOR_CONNECT_ELASTIC_URL
-          value: {{ .Values.url | quote }}
-        
-
