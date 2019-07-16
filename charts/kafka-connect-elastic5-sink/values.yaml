@@ -97,6 +97,8 @@ topics: "__REQUIRED__"
 # kcql KCQL expression describing field selection and routes. type: STRING importance: HIGH
 kcql: "__REQUIRED__"
 
+extraEnv: {}
+
 # batchSize How many records to process at one time. As records are pulled from Kafka it can be 100k+ which will not be feasible to throw at Elastic search at once type: INT importance: MEDIUM
 batchSize: 4000
 
@@ -110,14 +112,13 @@ elasticClusterName: elasticsearch
 writeTimeout: 300000
 
 # xpackPlugins Provide the full class name for all the plugins you want to enable. type: STRING importance: MEDIUM
-xpackPlugins: 
+xpackPlugins:
+
+# xpackSettings XpackSettings key in the secret. Enable xpack security add on by providing this setting type: PASSWORD importance: MEDIUM
+xpackSettings:
 
 # urlPrefix URL connection string prefix type: STRING importance: LOW
 urlPrefix: elasticsearch
-
-# xpackSettings XpackSettings key in the secret. Enable xpack security add on by providing this setting type: PASSWORD importance: MEDIUM
-xpackSettings: |-
- ""
 
 # url Url including port for Elastic Search cluster node. type: STRING importance: HIGH
 url: localhost:9300
