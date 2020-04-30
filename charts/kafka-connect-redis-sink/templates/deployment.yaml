@@ -241,3 +241,11 @@ spec:
           value: {{ .Values.errorPolicy | quote }}
         - name: CONNECTOR_CONNECT_PROGRESS_ENABLED
           value: {{ .Values.progressEnabled | quote }}
+        
+        # override config
+        {{- if .Values.overrideEnv }}
+        {{- range $key, $value := .Values.overrideEnv }}
+        - name: {{ $key | quote }}
+          value: {{  $value | quote }}
+        {{- end }}
+        {{- end }}
