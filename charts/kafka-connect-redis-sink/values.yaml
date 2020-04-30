@@ -97,6 +97,9 @@ topics: "__REQUIRED__"
 # kcql connect.redis.kcql type: STRING importance: HIGH
 kcql: "__REQUIRED__"
 
+# Any env that needs to be overwritten
+overrideEnv: {}
+
 # password stored in the secret for Redis
 password: "__REQUIRED__"
 

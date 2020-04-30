@@ -278,3 +278,11 @@ spec:
               name: {{ include "fullname" . }}
               key:  "connect.redis.keystore.pass"
         {{- end }}
+        
+        # override config
+        {{- if .Values.overrideEnv }}
+        {{- range $key, $value := .Values.overrideEnv }}
+        - name: {{ $key | quote }}
+          value: {{  $value | quote }}
+        {{- end }}
+        {{- end }}
