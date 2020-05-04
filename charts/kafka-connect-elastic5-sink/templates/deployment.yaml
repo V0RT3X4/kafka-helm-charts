@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ include "fullname" . }}
@@ -11,6 +11,9 @@ metadata:
     lenses.io/app.type: lenses-connector
     lenses.io/pipeline: {{ .Values.monitoring.pipeline | quote }}    
 spec:
+  selector:
+    matchLabels:
+      app: {{ include "fullname" . | quote }}
   replicas: {{ .Values.replicaCount }}
   serviceName: {{ template "fullname" . }}-headless
   podManagementPolicy: {{ .Values.podManagementPolicy }}
@@ -231,9 +234,9 @@ spec:
         - name: CONNECTOR_CONNECT_ELASTIC_USE_HTTP
           value: {{ .Values.useHttp | quote }} 
 
-        # extra config
-        {{- if .Values.extraEnv }}
-        {{- range $key, $value := .Values.extraEnv }}
+        # extra connector properties
+        {{- if .Values.transforms }}
+        {{- range $key, $value := .Values.transforms }}
         - name: CONNECTOR_{{ $key | upper }}
           value: {{  $value | quote }}
         {{- end }}
@@ -244,24 +247,18 @@ spec:
           value: {{ .Values.elasticClusterName | quote }}
         - name: CONNECTOR_CONNECT_ELASTIC_WRITE_TIMEOUT
           value: {{ .Values.writeTimeout | quote }}
-
-        - name: CONNECTOR_CONNECT_ELASTIC_URL_PREFIX
-          value: {{ .Values.urlPrefix | quote }}
-        - name: CONNECTOR_CONNECT_ELASTIC_URL
-          value: {{ .Values.url | quote }}
-
-
-        {{- if .Values.xpackSettings }}
+        {{- if .Values.xpackPlugins }}
         - name: CONNECTOR_CONNECT_ELASTIC_XPACK_PLUGINS
           value: {{ .Values.xpackPlugins | quote }}
-        # only create SECRET_CONNECT_ELASTIC_XPACK_SETTINGS if xpackSettings supplied
+        {{- end }}
+        - name: CONNECTOR_CONNECT_ELASTIC_URL_PREFIX
+          value: {{ .Values.urlPrefix | quote }}
         - name: SECRET_CONNECT_ELASTIC_XPACK_SETTINGS
           valueFrom:
             secretKeyRef:
               name: {{ include "fullname" . }}
               key:  "connect.elastic.xpack.settings"
-        {{- else }}
-        # Hack so that lenses-cli will create /etc/kafka-connect/secrets.properties
-        - name: SECRET_I_DONT_MATTER
-          value: I Dont Matter
-        {{- end }}
+        - name: CONNECTOR_CONNECT_ELASTIC_URL
+          value: {{ .Values.url | quote }}
+        
+
